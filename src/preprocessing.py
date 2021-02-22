@@ -18,5 +18,5 @@ def clean_text(df):
     df.dropna(inplace=True, subset=['motivation'])
     print('stopwords and punctuations are removed from the text!')
     return df
-# def stem_text(df):
+
 
