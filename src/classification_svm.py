@@ -11,6 +11,10 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
 from IPython.display import display
+from sklearn.metrics import confusion_matrix
+import numpy as np
+import seaborn as sns
+from sklearn.linear_model import LogisticRegression
 
 
 def cut_testset(df):
@@ -22,27 +26,29 @@ def cut_testset(df):
     print("testset and trainset are stoerd in 'data\preprocessed' folder.")
 
 
-def train_svm(X_train, y_train, model_name='svm_model'):
+def train_svm(X_train, y_train):
 
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(X_train.values.astype('U'))
-    clf = SVC(kernel='rbf', class_weight='balanced', C=1.0).fit(X, y_train)
-    # clf = SVC(kernel='rbf', class_weight='balanced', C=100, gamma=0.001).fit(X, y_train)
+    # clf = SVC(kernel='rbf', class_weight='balanced', C=1.0).fit(X, y_train)
+    clf = SVC(kernel='rbf', class_weight='balanced', C=100, gamma=0.001).fit(X, y_train)
 
     # save the model to disk
-    pickle.dump(clf, open("../data/model/" + model_name + ".sav", 'wb'))
+    pickle.dump(clf, open("../data/model/svm_model.sav", 'wb'))
+    pickle.dump(vectorizer, open("../data/model/vectorizer.pickle", "wb"))
 
-    X_v = vectorizer.transform(X_train.values.astype('U'))
-    predict_train = clf.predict(X_v)
+    # X_v = vectorizer.transform(X_train.values.astype('U'))
+    predict_train = clf.predict(X)
 
     print("train Accuracy for SVM: %s" % accuracy_score(y_train, predict_train))
 
     print("svm_model.sav is saved in 'data\model' folder")
-    return vectorizer
+    # return vectorizer
 
-def predict_svm(vectorizer, X_val, y_val, model_name='svm_model'):
+def predict_svm(X_val, y_val):
     # load the model from disk
-    clf = pickle.load(open('../data/model/'+ model_name + '.sav', 'rb'))
+    clf = pickle.load(open('../data/model/svm_model.sav', 'rb'))
+    vectorizer = pickle.load(open("../data/model/vectorizer.pickle", "rb"))
 
     X_v = vectorizer.transform(X_val.values.astype('U'))
     predictions = clf.predict(X_v)
@@ -50,6 +56,8 @@ def predict_svm(vectorizer, X_val, y_val, model_name='svm_model'):
     print("Final Accuracy for SVM: %s" % accuracy_score(y_val, predictions))
     cm = confusion_matrix(y_val, predictions)
     print(classification_report(y_val, predictions))
+    sns.heatmap(cm / np.sum(cm), annot=True,
+                fmt='.2%', cmap='Blues')
 
 
 def svm_cross(X_train, y_train):
