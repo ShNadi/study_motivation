@@ -1,0 +1,18 @@
+# exclude compiled binaries and external models
+/bin
+
+# exclude data from source control by default
+/data/temp
+/data/processed
+/data/raw
+/data
+/results
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+### notebook ###
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
