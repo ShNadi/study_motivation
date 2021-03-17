@@ -8,7 +8,9 @@ def read_df( status = 'read'):
                         'gender', 'HSGPA', 'interest', 'ase', 'reenrolled', 'bsa_dummy']
 
         df_2014 = pd.read_csv(r'..\data\raw\motivatoin_2014.csv')
+        df_2014 ['year'] = '2014'
         df_2015 = pd.read_csv(r'..\data\raw\motivation_2015.csv', usecols = columns)
+        df_2015['year'] = '2015'
 
         df_2014.rename(columns={"COHORT": "cohort"}, inplace=True)
 
