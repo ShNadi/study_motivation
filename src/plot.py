@@ -28,7 +28,7 @@ def plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE= None):
         plt.yticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=10)
         cb = plt.colorbar()
         cb.ax.tick_params(labelsize=14)
-        plt.title('Correlation Matrix', fontsize=16,  y=-0.01);
+        plt.title('Correlation Matrix', fontsize=16,  y=-0.1);
         plt.show()
 
 
