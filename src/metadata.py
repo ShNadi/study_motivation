@@ -3,8 +3,8 @@ import string
 
 
 def count_punctuation(df):
-	# Counts the number of punctuations in the text
-	count = lambda l1, l2: sum([1 for x in l1 if x in l2])
+    # Counts the number of punctuations in the text
+    count = lambda l1, l2: sum([1 for x in l1 if x in l2])
     df['count_punct'] = df.motivation.apply(lambda s: count(s, string.punctuation))
     df.to_csv(r'..\data\processed\motivation_liwc_meta.csv', index=False)
 
