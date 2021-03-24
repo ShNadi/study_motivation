@@ -1,4 +1,3 @@
-import pandas as pd
 import load_dataset
 import seaborn as sns
 import matplotlib.pyplot as plt
