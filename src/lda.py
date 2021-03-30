@@ -32,7 +32,7 @@ def lda_func(num_topics=10):
 
     # Reading the dataset
     df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos.csv', usecols=['motivation', 'bsa_dummy'])
-    df = shuffle(df)
+    df = shuffle(df,  random_state=100)
 
     # Data Preprocessing- tokenization, remove stopwords, lemmatization, stemming - Prepare data for LDA Analysis
     # Remove punctuation
@@ -60,7 +60,7 @@ def lda_func(num_topics=10):
                                            id2word=id2word,
                                            num_topics=num_topics, random_state=0)
     # Print the Keyword in the 10 topics
-    with open(r'../results/output/lda/lda_output.txt', 'w') as f:
+    with open(r'../results/output/lda/lda_output_'+ str(num_topics)+'.txt', 'w') as f:
         with redirect_stdout(f):
             print(lda_model.print_topics())
 
@@ -94,4 +94,19 @@ def remove_stopwords(texts):
 
 
 if __name__ == '__main__':
-    lda_func()
+    # number of topics = 4
+    # lda_func(4)
+    # number of topics = 5
+    # lda_func(5)
+    # # number of topics = 10
+    # lda_func(10)
+    # number of topics = 15
+    lda_func(15)
+    # # number of topics = 20
+    # lda_func(20)
+    # # number of topics = 30
+    # lda_func(50)
+    #
+
+
+
