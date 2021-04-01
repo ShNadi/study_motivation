@@ -41,8 +41,6 @@ def lda_document_topic_distribution():
      Using LDA, this function distinguish 10 topic category from the text
      and calculates document-topic matrix.
 
-     for Dutch lemmatization download 'nl_core_news_sm' using following command:
-     python -m spacy download nl_core_news_sm
 
     """
 
@@ -166,7 +164,11 @@ This function makes bigrams form the text data.
 #     return [trigram_mod[bigram_mod[doc]] for doc in texts]
 
 def lemmatization(texts, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
-    """https://spacy.io/api/annotation"""
+    """https://spacy.io/api/annotation
+
+    for Dutch lemmatization download 'nl_core_news_sm' using following command:
+     python -m spacy download nl_core_news_sm
+    """
     texts_out = []
     for sent in texts:
         doc = nlp(" ".join(sent))
@@ -174,7 +176,17 @@ def lemmatization(texts, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
     return texts_out
 
 def lda_report(lda_model, corpus, data_lemmatized, id2word):
-
+    """
+    This function reports Perplexity, Coherence Score and also visualize the topics.
+    :param lda_model:
+    :type lda_model:
+    :param corpus:
+    :type corpus:
+    :param data_lemmatized:
+    :type data_lemmatized:
+    :param id2word:
+    :type id2word:
+    """
     with open(r'../results/output/lda/Best_lda_model/lda_bm_n10.txt', 'w') as f:
         with redirect_stdout(f):
             print(lda_model.print_topics())
