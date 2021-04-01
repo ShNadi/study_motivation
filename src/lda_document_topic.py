@@ -42,7 +42,7 @@ def lda_document_topic_distribution():
     """
 
     # Load and shuffle the dataset
-    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos.csv', usecols=['motivation', 'bsa_dummy'])
+    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos.csv')
     df = shuffle(df, random_state=100)
 
     # Convert to list
@@ -73,7 +73,7 @@ def lda_document_topic_distribution():
 
     # Initialize spacy 'en' model, keeping only tagger component (for efficiency)
     # python3 -m spacy download en
-    nlp = spacy.load('nl_core_news_sm', disable=['parser', 'ner'])
+    nlp = spacy.load(r'C:\ProgramData\Miniconda3\Lib\site-packages\nl_core_news_sm\nl_core_news_sm-2.2.5', disable=['parser', 'ner'])
 
     # Do lemmatization keeping only noun, adj, vb, adv
     data_lemmatized = lemmatization(data_words_bigrams, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
@@ -99,9 +99,12 @@ def lda_document_topic_distribution():
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
 
-    # Dump LDA model
-    with open(r'..\data\model\LDA_bestmodel_n10', 'wb') as f:
-        pickle.dump(lda_model, f)
+    # # Dump LDA model
+    # with open(r'..\data\model\LDA_bestmodel_n10', 'wb') as f:
+    #     pickle.dump(lda_model, f)
+    # Save theLDA model to disk
+    filename = r'..\data\model\LDA_bestmodel_n10.sav'
+    pickle.dump(lda_model, open(filename, 'wb'))
 
     lda_report(lda_model, corpus, data_lemmatized, id2word)
     get_document_topics = [lda_model.get_document_topics(item) for item in corpus]
@@ -110,7 +113,12 @@ def lda_document_topic_distribution():
     df_topic = pd.DataFrame(a[:, :, 1],
                        columns=['topic1', 'topic2', 'topic3', 'topic4', 'topic5', 'topic6', 'topic7', 'topic8',
                                 'topic9', 'topic10'])
-    print(df_topic)
+    # Join main dataframe and topic dataframe
+    df_final = df.join(df_topic)
+
+    # Save dataset to disk
+    df_final.to_csv(r'..\data\processed\motivation_liwic_meta_pos_topic.csv', index=False)
+    print(df_final)
 
 
 
