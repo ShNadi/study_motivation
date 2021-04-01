@@ -107,10 +107,10 @@ def lda_document_topic_distribution():
     get_document_topics = [lda_model.get_document_topics(item) for item in corpus]
     v = get_document_topics
     a = np.array(v)
-    df = pd.DataFrame(a[:, :, 1],
+    df_topic = pd.DataFrame(a[:, :, 1],
                        columns=['topic1', 'topic2', 'topic3', 'topic4', 'topic5', 'topic6', 'topic7', 'topic8',
                                 'topic9', 'topic10'])
-    print(df)
+    print(df_topic)
 
 
 
