@@ -5,12 +5,22 @@ from nltk.corpus import stopwords
 import re
 import numpy as np
 import pandas as pd
+from contextlib import redirect_stdout
+import pickle
+import os
 # Gensim
 import gensim
 import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
+from gensim.models import CoherenceModel
 # spacy for lemmatization
 import spacy
+
+# Plotting tools
+import pyLDAvis
+import pyLDAvis.gensim_models as gensimvis
+import matplotlib.pyplot as plt
+
 # Enable logging for gensim - optional
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
@@ -81,13 +91,14 @@ def lda_document_topic_distribution():
     lda_model2 = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                                  id2word=id2word,
                                                  num_topics=10,
-                                                 random_state=100,
+                                                 random_state=0,
                                                  update_every=1,
                                                  chunksize=100,
                                                  passes=10,
                                                  alpha='auto',
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
+    lda_report(lda_model2, corpus, data_words_bigrams, id2word)
     get_document_topics = [lda_model2.get_document_topics(item) for item in corpus]
     v = get_document_topics
     a = np.array(v)
@@ -145,6 +156,42 @@ def lemmatization(texts, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
         doc = nlp(" ".join(sent))
         texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
     return texts_out
+
+def lda_report(lda_model, corpus, data_words_bigrams, id2word):
+
+    with open(r'../results/output/lda/Best_lda_model/lda_bm_n10.txt', 'w') as f:
+        with redirect_stdout(f):
+            print(lda_model.print_topics())
+
+    # Compute Perplexity
+    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n10.txt', 'w') as f:
+        with redirect_stdout(f):
+            print('\nPerplexity: ',
+                  lda_model.log_perplexity(corpus))  # a measure of how good the model is. lower the better.
+
+    # Compute Coherence Score
+    # coherence_model_lda = CoherenceModel(model=lda_model, texts=data_lemmatized, dictionary=id2word, coherence='c_v')
+    coherence_model_lda = CoherenceModel(model=lda_model, texts=data_words_bigrams, dictionary=id2word,
+                                         coherence='c_v')
+    coherence_lda = coherence_model_lda.get_coherence()
+
+    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n10.txt', 'a') as f:
+        with redirect_stdout(f):
+            print('\nCoherence Score: ', coherence_lda)
+
+    # Visualize the topics
+    # vis = gensimvis.prepare(lda_model, corpus, id2word)
+    LDAvis_data_filepath = os.path.join(r'../results/output/lda/Best_lda_model/ldavis_prepared_n10')
+
+    if 1 == 1:
+        LDAvis_prepared = gensimvis.prepare(lda_model, corpus, id2word)
+        with open(LDAvis_data_filepath, 'wb') as f:
+            pickle.dump(LDAvis_prepared, f)
+    # load the pre-prepared pyLDAvis data from disk
+    with open(LDAvis_data_filepath, 'rb') as f:
+        LDAvis_prepared = pickle.load(f)
+    pyLDAvis.save_html(LDAvis_prepared, r'../results/output/lda/Best_lda_model/ldavis_n10.html')
+
 
 
 if __name__ == "__main__":
