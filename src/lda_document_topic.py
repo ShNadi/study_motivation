@@ -98,7 +98,10 @@ def lda_document_topic_distribution():
                                                  alpha='auto',
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
-    
+
+    # Dump LDA model
+    with open(r'..\data\model\LDA_bestmodel_n10', 'wb') as f:
+        pickle.dump(lda_model2, f)
 
     lda_report(lda_model2, corpus, data_lemmatized, id2word)
     get_document_topics = [lda_model2.get_document_topics(item) for item in corpus]
