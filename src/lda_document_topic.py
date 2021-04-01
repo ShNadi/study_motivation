@@ -88,7 +88,7 @@ def lda_document_topic_distribution():
     corpus = [id2word.doc2bow(text) for text in texts]
 
     # Build LDA model- number of topics=10
-    lda_model2 = gensim.models.ldamodel.LdaModel(corpus=corpus,
+    lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                                  id2word=id2word,
                                                  num_topics=10,
                                                  random_state=0,
@@ -101,16 +101,16 @@ def lda_document_topic_distribution():
 
     # Dump LDA model
     with open(r'..\data\model\LDA_bestmodel_n10', 'wb') as f:
-        pickle.dump(lda_model2, f)
+        pickle.dump(lda_model, f)
 
-    lda_report(lda_model2, corpus, data_lemmatized, id2word)
-    get_document_topics = [lda_model2.get_document_topics(item) for item in corpus]
+    lda_report(lda_model, corpus, data_lemmatized, id2word)
+    get_document_topics = [lda_model.get_document_topics(item) for item in corpus]
     v = get_document_topics
     a = np.array(v)
-    df2 = pd.DataFrame(a[:, :, 1],
+    df = pd.DataFrame(a[:, :, 1],
                        columns=['topic1', 'topic2', 'topic3', 'topic4', 'topic5', 'topic6', 'topic7', 'topic8',
                                 'topic9', 'topic10'])
-    print(df2)
+    print(df)
 
 
 
