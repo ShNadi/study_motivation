@@ -73,16 +73,16 @@ def lda_document_topic_distribution():
 
     # Initialize spacy 'en' model, keeping only tagger component (for efficiency)
     # python3 -m spacy download en
-    # nlp = spacy.load('en', disable=['parser', 'ner'])
+    nlp = spacy.load('nl_core_news_sm', disable=['parser', 'ner'])
 
     # Do lemmatization keeping only noun, adj, vb, adv
-    # data_lemmatized = lemmatization(data_words_bigrams, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+    data_lemmatized = lemmatization(data_words_bigrams, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
 
     # Create Dictionary
-    id2word = corpora.Dictionary(data_words_bigrams)
+    id2word = corpora.Dictionary(data_lemmatized)
 
     # Create Corpus
-    texts = data_words_bigrams
+    texts = data_lemmatized
 
     # Term Document Frequency
     corpus = [id2word.doc2bow(text) for text in texts]
@@ -98,7 +98,9 @@ def lda_document_topic_distribution():
                                                  alpha='auto',
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
-    lda_report(lda_model2, corpus, data_words_bigrams, id2word)
+    
+
+    lda_report(lda_model2, corpus, data_lemmatized, id2word)
     get_document_topics = [lda_model2.get_document_topics(item) for item in corpus]
     v = get_document_topics
     a = np.array(v)
@@ -157,7 +159,7 @@ def lemmatization(texts, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
         texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
     return texts_out
 
-def lda_report(lda_model, corpus, data_words_bigrams, id2word):
+def lda_report(lda_model, corpus, data_lemmatized, id2word):
 
     with open(r'../results/output/lda/Best_lda_model/lda_bm_n10.txt', 'w') as f:
         with redirect_stdout(f):
@@ -170,9 +172,9 @@ def lda_report(lda_model, corpus, data_words_bigrams, id2word):
                   lda_model.log_perplexity(corpus))  # a measure of how good the model is. lower the better.
 
     # Compute Coherence Score
-    # coherence_model_lda = CoherenceModel(model=lda_model, texts=data_lemmatized, dictionary=id2word, coherence='c_v')
-    coherence_model_lda = CoherenceModel(model=lda_model, texts=data_words_bigrams, dictionary=id2word,
-                                         coherence='c_v')
+    coherence_model_lda = CoherenceModel(model=lda_model, texts=data_lemmatized, dictionary=id2word, coherence='c_v')
+    # coherence_model_lda = CoherenceModel(model=lda_model, texts=data_words_bigrams, dictionary=id2word,
+    #                                      coherence='c_v')
     coherence_lda = coherence_model_lda.get_coherence()
 
     with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n10.txt', 'a') as f:
