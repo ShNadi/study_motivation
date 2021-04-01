@@ -8,11 +8,13 @@ import pandas as pd
 from contextlib import redirect_stdout
 import pickle
 import os
+
 # Gensim
 import gensim
 import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
 from gensim.models import CoherenceModel
+
 # spacy for lemmatization
 import spacy
 
@@ -34,10 +36,13 @@ stop_words = stopwords.words('Dutch')
 
 
 def lda_document_topic_distribution():
-    """ Document Topic Distribuation
+    """ Document Topic Distribution
 
      Using LDA, this function distinguish 10 topic category from the text
      and calculates document-topic matrix.
+
+     for Dutch lemmatization download 'nl_core_news_sm' using following command:
+     python -m spacy download nl_core_news_sm
 
     """
 
@@ -99,11 +104,9 @@ def lda_document_topic_distribution():
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
 
-    # # Dump LDA model
-    # with open(r'..\data\model\LDA_bestmodel_n10', 'wb') as f:
-    #     pickle.dump(lda_model, f)
+
     # Save theLDA model to disk
-    filename = r'..\data\model\LDA_bestmodel_n10.sav'
+    filename = r'..\data\model\LDA_bestmodel_n10\LDA_bestmodel_n10.sav'
     pickle.dump(lda_model, open(filename, 'wb'))
 
     lda_report(lda_model, corpus, data_lemmatized, id2word)
