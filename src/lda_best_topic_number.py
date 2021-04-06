@@ -1,10 +1,6 @@
-import pandas as pd
 from sklearn.utils import shuffle
-import nltk
-import os
 from nltk.corpus import stopwords
 import re
-import numpy as np
 import pandas as pd
 from pprint import pprint
 from contextlib import redirect_stdout
@@ -18,12 +14,6 @@ from gensim.models import CoherenceModel
 # spacy for lemmatization
 import spacy
 
-# Plotting tools
-import pyLDAvis
-import pyLDAvis.gensim_models as gensimvis
-
-
-import pickle
 
 # Enable logging for gensim - optional
 import logging
