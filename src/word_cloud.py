@@ -2,7 +2,6 @@ import pandas as pd
 from wordcloud import WordCloud
 from nltk.corpus import stopwords
 import matplotlib.pyplot as plt
-import load_dataset
 
 
 def remove_stopwords(text):
@@ -12,10 +11,12 @@ def remove_stopwords(text):
 
 def show_wordcloud(df, n=100):
 
-    # df['removed_stopwords'] = df.apply(lambda x: remove_stopwords(x['motivation']), axis=1)
+    df['motivation'] = df['motivation'].str.lower()
+
+    df['removed_stopwords'] = df.apply(lambda x: remove_stopwords(x['motivation']), axis=1)
 
     # Plot wordcloud of 100 most frequent words
-    text = ' '.join(df['motivation'])
+    text = ' '.join(df['removed_stopwords'])
     wordcloud = WordCloud(
         width=3000,
         height=2000,
@@ -30,7 +31,7 @@ def show_wordcloud(df, n=100):
 
 
 if __name__ == "__main__":
-    df = load_dataset.read_df()
+    df = pd.read_csv('../data/processed/motivation.csv')
     show_wordcloud(df, 100)
 
 
