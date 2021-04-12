@@ -32,12 +32,18 @@ def show_wordcloud(df, n=100):
 
 if __name__ == "__main__":
     df = pd.read_csv('../data/processed/motivation.csv')
-    show_wordcloud(df, 100)
+    # show_wordcloud(df, 100)
 
     # bsadummy_class0 = df[df['bsa_dummy'] == 0]
     # show_wordcloud(bsadummy_class0, 100)
 
     # bsadummy_class1 = df[df['bsa_dummy'] == 1]
     # show_wordcloud(bsadummy_class1, 100)
+
+    # reenrolled_class0 = df[df['reenrolled'] == 0]
+    # show_wordcloud(reenrolled_class0, 100)
+
+    reenrolled_class1 = df[df['reenrolled'] == 1]
+    show_wordcloud(reenrolled_class1, 100)
 
 
