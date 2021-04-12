@@ -43,7 +43,9 @@ if __name__ == "__main__":
     # reenrolled_class0 = df[df['reenrolled'] == 0]
     # show_wordcloud(reenrolled_class0, 100)
 
-    reenrolled_class1 = df[df['reenrolled'] == 1]
-    show_wordcloud(reenrolled_class1, 100)
+    # reenrolled_class1 = df[df['reenrolled'] == 1]
+    # show_wordcloud(reenrolled_class1, 100)
+
+
 
 
