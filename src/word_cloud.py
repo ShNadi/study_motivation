@@ -11,7 +11,7 @@ def remove_stopwords(text):
 
 def show_wordcloud(df, n=100):
 
-    df['motivation'] = df['motivation'].str.lower()
+    df['motivation'] = df.motivation.str.lower()
 
     df['removed_stopwords'] = df.apply(lambda x: remove_stopwords(x['motivation']), axis=1)
 
@@ -33,5 +33,11 @@ def show_wordcloud(df, n=100):
 if __name__ == "__main__":
     df = pd.read_csv('../data/processed/motivation.csv')
     show_wordcloud(df, 100)
+
+    # bsadummy_class0 = df[df['bsa_dummy'] == 0]
+    # show_wordcloud(bsadummy_class0, 100)
+
+    # bsadummy_class1 = df[df['bsa_dummy'] == 1]
+    # show_wordcloud(bsadummy_class1, 100)
 
 
