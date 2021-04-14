@@ -31,8 +31,16 @@ def plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE= None):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('../data/processed/motivation.csv')
-    plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE='year')
+    # df = pd.read_csv('../data/processed/motivation.csv')
+    # plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE='year')
+
+    df = pd.read_csv('../data/processed/motivation_liwic_meta_pos_topic.csv')
+    plot_var(df, type='boxplot', Y='nr_token', X='bsa_dummy')
+    plot_var(df, type='boxplot', Y='nr_adj', X='bsa_dummy')
+    plot_var(df, type='boxplot', Y='nr_noun', X='bsa_dummy')
+    plot_var(df, type='boxplot', Y='nr_verb', X='bsa_dummy')
+    plot_var(df, type='boxplot', Y='nr_number', X='bsa_dummy')
+
     # plot_var(df, type='correlation_matrix')
 
 
