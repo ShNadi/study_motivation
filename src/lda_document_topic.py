@@ -118,7 +118,7 @@ def lda_document_topic_distribution():
     df_final = df.join(df_topic)
 
     # Save dataset to disk
-    df_final.to_csv(r'..\data\processed\motivation_liwic_meta_pos_topic.csv', index=False)
+    df_final.to_csv(r'..\data\processed\motivation_liwc_meta_pos_topic.csv', index=False)
     print(df_final)
 
 
