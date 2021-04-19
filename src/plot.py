@@ -28,11 +28,16 @@ def plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE= None):
         plt.title('Correlation Matrix', fontsize=16,  y=-0.1);
         plt.show()
 
+    if type == 'correlation_matrix_numbers':
+        fig, ax = plt.subplots(figsize=(15, 15))
+        correlation_mat = df.corr()
+        sns.heatmap(correlation_mat, annot=True)
+        plt.show()
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('../data/processed/motivation.csv')
-    plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE='year')
+    # df = pd.read_csv('../data/processed/motivation.csv')
+    # plot_var(df, type='boxplot', Y='age', X='bsa_dummy', HUE='year')
 
     # df = pd.read_csv('../data/processed/motivation_liwic_meta_pos_topic.csv')
     # plot_var(df, type='boxplot', Y='nr_token', X='bsa_dummy')
@@ -42,5 +47,16 @@ if __name__ == "__main__":
     # plot_var(df, type='boxplot', Y='nr_number', X='bsa_dummy')
 
     # plot_var(df, type='correlation_matrix')
+
+    # df = pd.read_csv('../data/processed/motivation_liwc_meta_pos.csv')
+    # plot_var(df, type='correlation_matrix')
+
+    df = pd.read_csv('../data/processed/motivation_liwc_meta_pos.csv')
+    plot_var(df, type='correlation_matrix_numbers')
+
+
+
+
+
 
 
