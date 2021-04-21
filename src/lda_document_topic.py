@@ -31,8 +31,16 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
-# Download list of Dutch stopwords
+# Download list of NLTK Dutch stopwords
 stop_words = stopwords.words('Dutch')
+
+# Add list of new stopwords to the NLTK stopwords
+with open('../results/output/dutch_stopwords/stopwords_new.txt') as f:
+    content = f.readlines()
+# Remove whitespace characters like `\n` at the end of each line
+content = [x.strip() for x in content]
+
+new_stopword_list = content + stop_words
 
 
 def lda_document_topic_distribution():
@@ -93,7 +101,7 @@ def lda_document_topic_distribution():
     # Build LDA model- number of topics=10
     lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                                  id2word=id2word,
-                                                 num_topics=10,
+                                                 num_topics=15,
                                                  random_state=0,
                                                  update_every=1,
                                                  chunksize=100,
@@ -104,7 +112,7 @@ def lda_document_topic_distribution():
 
 
     # Save theLDA model to disk
-    filename = r'..\data\model\LDA_bestmodel_n10\LDA_bestmodel_n10.sav'
+    filename = r'..\data\model\LDA_bestmodel_n15\LDA_bestmodel_n15.sav'
     pickle.dump(lda_model, open(filename, 'wb'))
 
     lda_report(lda_model, corpus, data_lemmatized, id2word)
@@ -113,12 +121,15 @@ def lda_document_topic_distribution():
     a = np.array(v)
     df_topic = pd.DataFrame(a[:, :, 1],
                        columns=['topic1', 'topic2', 'topic3', 'topic4', 'topic5', 'topic6', 'topic7', 'topic8',
-                                'topic9', 'topic10'])
+                                'topic9', 'topic10', 'topic11', 'topic12', 'topic13', 'topic14', 'topic15'])
+
+    # df_topic = pd.DataFrame(a[:, :, 1],
+    #                         columns=['topic1', 'topic2', 'topic3', 'topic4', 'topic5'])
     # Join main dataframe and topic dataframe
     df_final = df.join(df_topic)
 
     # Save dataset to disk
-    df_final.to_csv(r'..\data\processed\motivation_liwc_meta_pos_topic.csv', index=False)
+    df_final.to_csv(r'..\data\processed\motivation_liwc_meta_pos_topic_n15.csv', index=False)
     print(df_final)
 
 
@@ -146,7 +157,7 @@ def remove_stopwords(texts):
     :return: the text without stopwords
     :rtype: list
     """
-    return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
+    return [[word for word in simple_preprocess(str(doc)) if word not in new_stopword_list] for doc in texts]
 
 def make_bigrams(texts, bigram_mod):
     """
@@ -187,12 +198,12 @@ def lda_report(lda_model, corpus, data_lemmatized, id2word):
     :param id2word:
     :type id2word:
     """
-    with open(r'../results/output/lda/Best_lda_model/lda_bm_n10.txt', 'w') as f:
+    with open(r'../results/output/lda/Best_lda_model/lda_bm_n15.txt', 'w') as f:
         with redirect_stdout(f):
             print(lda_model.print_topics())
 
     # Compute Perplexity
-    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n10.txt', 'w') as f:
+    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n15.txt', 'w') as f:
         with redirect_stdout(f):
             print('\nPerplexity: ',
                   lda_model.log_perplexity(corpus))  # a measure of how good the model is. lower the better.
@@ -203,13 +214,13 @@ def lda_report(lda_model, corpus, data_lemmatized, id2word):
     #                                      coherence='c_v')
     coherence_lda = coherence_model_lda.get_coherence()
 
-    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n10.txt', 'a') as f:
+    with open(r'../results/output/lda/Best_lda_model/lda_output_bm_n15.txt', 'a') as f:
         with redirect_stdout(f):
             print('\nCoherence Score: ', coherence_lda)
 
     # Visualize the topics
     # vis = gensimvis.prepare(lda_model, corpus, id2word)
-    LDAvis_data_filepath = os.path.join(r'../results/output/lda/Best_lda_model/ldavis_prepared_n10')
+    LDAvis_data_filepath = os.path.join(r'../results/output/lda/Best_lda_model/ldavis_prepared_n15')
 
     if 1 == 1:
         LDAvis_prepared = gensimvis.prepare(lda_model, corpus, id2word)
@@ -218,7 +229,7 @@ def lda_report(lda_model, corpus, data_lemmatized, id2word):
     # load the pre-prepared pyLDAvis data from disk
     with open(LDAvis_data_filepath, 'rb') as f:
         LDAvis_prepared = pickle.load(f)
-    pyLDAvis.save_html(LDAvis_prepared, r'../results/output/lda/Best_lda_model/ldavis_n10.html')
+    pyLDAvis.save_html(LDAvis_prepared, r'../results/output/lda/Best_lda_model/ldavis_n15.html')
 
 
 
