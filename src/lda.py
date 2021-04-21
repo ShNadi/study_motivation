@@ -56,9 +56,16 @@ def lda_func(num_topics=10):
     # number of topics
     # num_topics = 10
     # Build LDA model
-    lda_model = gensim.models.LdaMulticore(corpus=corpus,
-                                           id2word=id2word,
-                                           num_topics=num_topics, random_state=0)
+    lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                                 id2word=id2word,
+                                                 num_topics=num_topics,
+                                                 random_state=0,
+                                                 update_every=1,
+                                                 chunksize=100,
+                                                 passes=10,
+                                                 alpha='auto',
+                                                 per_word_topics=True,
+                                                 minimum_probability=0.0)
     # Print the Keyword in the 10 topics
     with open(r'../results/output/lda/lda_output_'+ str(num_topics)+'.txt', 'w') as f:
         with redirect_stdout(f):
