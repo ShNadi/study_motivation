@@ -23,7 +23,13 @@ import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
 stop_words = stopwords.words('Dutch')
+# Add list of new stopwords to the NLTK stopwords
+with open('../results/output/dutch_stopwords/stopwords_new.txt') as f:
+    content = f.readlines()
+# Remove whitespace characters like `\n` at the end of each line
+content = [x.strip() for x in content]
 
+new_stopword_list = content + stop_words
 
 def calculate_best_topic_number():
 
@@ -79,10 +85,10 @@ def calculate_best_topic_number():
     # model_list, coherence_values = compute_coherence_values(dictionary=id2word, corpus=corpus, texts=data_lemmatized,
     #                                                         start=5, limit=45, step=5)
     model_list, coherence_values = compute_coherence_values(dictionary=id2word, corpus=corpus, texts=data_words_bigrams,
-                                                            start=5, limit=45, step=5)
+                                                            start=5, limit=30, step=5)
 
     # Show graph
-    limit = 45;
+    limit = 30;
     start = 5;
     step = 5;
     x = range(start, limit, step)
