@@ -6,6 +6,9 @@ import time
 
 
 def calculate_the_word_types(data):
+    ''''
+    Does part-of-speak tagging and calculates the number of word types for each document.
+    '''
     nouns = defaultdict(lambda: 0)
     verbs = defaultdict(lambda: 0)
     adjectives = defaultdict(lambda: 0)
