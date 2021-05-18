@@ -53,7 +53,7 @@ def lda_document_topic_distribution():
     """
 
     # Load and shuffle the dataset
-    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos.csv')
+    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos_lang.csv')
     df = shuffle(df, random_state=100)
 
     # Convert to list
@@ -87,13 +87,13 @@ def lda_document_topic_distribution():
     nlp = spacy.load(r'C:\ProgramData\Miniconda3\Lib\site-packages\nl_core_news_sm\nl_core_news_sm-2.2.5', disable=['parser', 'ner'])
 
     # Do lemmatization keeping only noun, adj, vb, adv
-    data_lemmatized = lemmatization(data_words_bigrams, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+    # data_lemmatized = lemmatization(data_words_bigrams, nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
 
     # Create Dictionary
-    id2word = corpora.Dictionary(data_lemmatized)
+    id2word = corpora.Dictionary(data_words_bigrams)
 
     # Create Corpus
-    texts = data_lemmatized
+    texts = data_words_bigrams
 
     # Term Document Frequency
     corpus = [id2word.doc2bow(text) for text in texts]
@@ -106,7 +106,6 @@ def lda_document_topic_distribution():
                                                  update_every=1,
                                                  chunksize=100,
                                                  passes=10,
-                                                 alpha='auto',
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
 
@@ -115,7 +114,7 @@ def lda_document_topic_distribution():
     filename = r'..\data\model\LDA_bestmodel_n15\LDA_bestmodel_n15.sav'
     pickle.dump(lda_model, open(filename, 'wb'))
 
-    lda_report(lda_model, corpus, data_lemmatized, id2word)
+    lda_report(lda_model, corpus, data_words_bigrams, id2word)
     get_document_topics = [lda_model.get_document_topics(item) for item in corpus]
     v = get_document_topics
     a = np.array(v)
