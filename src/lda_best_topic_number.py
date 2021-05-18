@@ -34,7 +34,7 @@ new_stopword_list = content + stop_words
 def calculate_best_topic_number():
 
     # Load and shuffle the dataset
-    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos.csv')
+    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos_lang.csv')
     df = shuffle(df, random_state=100)
 
     # Convert to list
@@ -85,25 +85,25 @@ def calculate_best_topic_number():
     # model_list, coherence_values = compute_coherence_values(dictionary=id2word, corpus=corpus, texts=data_lemmatized,
     #                                                         start=5, limit=45, step=5)
     model_list, coherence_values = compute_coherence_values(dictionary=id2word, corpus=corpus, texts=data_words_bigrams,
-                                                            start=5, limit=30, step=5)
+                                                            start=10, limit=16, step=1)
 
     # Show graph
-    limit = 30;
-    start = 5;
-    step = 5;
+    limit = 16;
+    start = 10;
+    step = 1;
     x = range(start, limit, step)
     plt.plot(x, coherence_values)
     plt.xlabel("Num Topics")
     plt.ylabel("Coherence score")
     plt.legend(("coherence_values"), loc='best')
     plt.savefig(
-        r'D:\project\5-motivation-Karlijn\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst'
+        r'D:\project\5-soppe-motivation\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst'
         r'\topic_score'
         r'.png')
 
 
     with open(
-            r'D:\project\5-motivation-Karlijn\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst\lda_output_scores.txt',
+            r'D:\project\5-soppe-motivation\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst\lda_output_scores.txt',
             'w') as f:
         with redirect_stdout(f):
             for m, cv in zip(x, coherence_values):
@@ -115,7 +115,7 @@ def calculate_best_topic_number():
         optimal_model = model_list[i]
         model_topics = optimal_model.show_topics(formatted=False)
         with open(
-                r'D:\project\5-motivation-Karlijn\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst\lda_output_' + str(
+                r'D:\project\5-soppe-motivation\Motivation-Karlijn\motivation\study_motivation\results\output\lda\tst\lda_output_' + str(
                         j) + '.txt', 'w') as f:
             with redirect_stdout(f):
                 pprint(optimal_model.print_topics(num_words=10))
@@ -149,7 +149,6 @@ def compute_coherence_values(dictionary, corpus, texts,limit, start=2, step=3):
                                                  update_every=1,
                                                  chunksize=100,
                                                  passes=10,
-                                                 alpha='auto',
                                                  per_word_topics=True,
                                                  minimum_probability=0.0)
         model_list.append(model)
