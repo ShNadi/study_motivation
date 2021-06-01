@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 
 
 def logistic_numeric(df):
+    # In target column (bsa_dummy), 0 stands for bsa obtained and 1 stands for bsa not obtained
+
     # Remove extra columns
     del df['language']
     del df['motivation']
@@ -27,6 +29,7 @@ def logistic_numeric(df):
     categorical_features = ['cohort', 'field', 'prior_educ', 'previously_enrolled', 'multiple_requests', 'gender',
                             'interest', 'ase', 'reenrolled', 'year']
 
+    # Select numeric features
     numeric_features = ['age', 'HSGPA', 'WC', 'WPS', 'Sixltr',
                         'Dic', 'funct', 'pronoun', 'ppron', 'i',
                         'we', 'you', 'shehe', 'they', 'ipron',
@@ -103,19 +106,30 @@ def logistic_numeric(df):
 
     # Train score
     print('train score: ', clf.score(X_train, y_train))
+    with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
+        print('train score: ', clf.score(X_train, y_train), file=f)
 
     # Test score
     print('test score: ', clf.score(X_test, y_test))
+    with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
+        print('\n', file=f)
+        print('test score: ', clf.score(X_test, y_test), file=f)
 
     # Predict results on the test set
     clf_predicted = clf.predict(X_test)
 
     # Build confusion matrix
     confusion = confusion_matrix(y_test, clf_predicted)
-    print(confusion)
+    print(confusion, file=f)
+    with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
+        print('\n', file=f)
+        print(confusion, file=f)
 
     # Print classification report
     print(classification_report(y_test, clf_predicted, target_names=['0', '1']))
+    with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
+        print('\n', file=f)
+        print(classification_report(y_test, clf_predicted, target_names=['0', '1']), file=f)
 
     # Extract feature importance
     importance = clf.steps[2][1].coef_
@@ -126,12 +140,18 @@ def logistic_numeric(df):
     for coef, feat in zip(clf.steps[2][1].coef_[0, :], feature_names):
         coef_dict[feat] = coef
 
+    # Sort feature_importance values
+    coef_dict = dict(sorted(coef_dict.items(), key=lambda item: item[1]))
+
     # Turn dictionary to series
     feature_importance = pd.Series(list(coef_dict.values()), index=coef_dict.keys())
-    print(feature_importance)
+    with open('../../results/output/classification_reports/logistic regression/feature_importance.txt', 'w') as f:
+        print(feature_importance, file=f)
+
+
 
     # Plot feature importance
-    feature_importance.plot.barh(figsize=(10, 20))
+    feature_importance.plot.barh(figsize=(15, 25))
     plt.show()
 
 
@@ -139,5 +159,5 @@ def logistic_numeric(df):
 
 
 if __name__=='__main__':
-    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos_topic_n15.csv')
+    df = pd.read_csv(r'..\..\data\processed\motivation_liwc_meta_pos_topic_n15.csv')
     logistic_numeric(df)
