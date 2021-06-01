@@ -120,16 +120,14 @@ def logistic_numeric(df):
 
     # Build confusion matrix
     confusion = confusion_matrix(y_test, clf_predicted)
-    print(confusion, file=f)
+    print(confusion)
     with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
-        print('\n', file=f)
-        print(confusion, file=f)
+        print('\n', confusion, file=f)
 
     # Print classification report
     print(classification_report(y_test, clf_predicted, target_names=['0', '1']))
     with open('../../results/output/classification_reports/logistic regression/report.txt', 'a+') as f:
-        print('\n', file=f)
-        print(classification_report(y_test, clf_predicted, target_names=['0', '1']), file=f)
+        print('\n', classification_report(y_test, clf_predicted, target_names=['0', '1']), file=f)
 
     # Extract feature importance
     importance = clf.steps[2][1].coef_
@@ -146,9 +144,8 @@ def logistic_numeric(df):
     # Turn dictionary to series
     feature_importance = pd.Series(list(coef_dict.values()), index=coef_dict.keys())
     with open('../../results/output/classification_reports/logistic regression/feature_importance.txt', 'w') as f:
-        print(feature_importance, file=f)
-
-
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(feature_importance, file=f)
 
     # Plot feature importance
     feature_importance.plot.barh(figsize=(15, 25))
