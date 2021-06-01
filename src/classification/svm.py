@@ -1,74 +1,156 @@
 import pandas as pd
-from imblearn.pipeline import make_pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+from imblearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-import seaborn as sns
-import numpy as np
-from nltk.corpus import stopwords
 import matplotlib.pyplot as plt
-from contextlib import redirect_stdout
-import pickle
 
 
+def svm_numeric(df):
+    # In target column (bsa_dummy), 0 stands for bsa obtained and 1 stands for bsa not obtained
 
-def svm_func(df, filename):
+    # Remove extra columns
+    del df['language']
+    del df['motivation']
+    del df['program']
+    del df['studentnr_crypt']
 
-    # keep test_set apart
-    df_train, df_test = train_test_split(df, test_size=0.25, stratify=df['bsa_dummy'], shuffle=True,
-                                             random_state=0)
-    X_train = df_train['motivation']
-    y_train = df_train['bsa_dummy']
-    X_test = df_test['motivation']
-    y_test = df_test['bsa_dummy']
+    df = df.fillna(method='ffill')
 
-    # df_train.to_csv(r'..\data\processed\train_set.csv', index=False)
-    # df_test.to_csv(r'..\data\processed\test_set.csv', index=False)
-    print("test_set and train_set are stored in 'data\preprocessed' folder.")
+    # Select categorical features
+    categorical_features = ['cohort', 'field', 'prior_educ', 'previously_enrolled', 'multiple_requests', 'gender',
+                            'interest', 'ase', 'reenrolled', 'year']
 
-    # # separate train/evaluation set
-    # X_train, X_val, y_train, y_val = train_test_split(df['motivation'], df['bsa_dummy'],
-    #                                                   stratify=df['bsa_dummy'],
-    #                                                   test_size=0.25, random_state=0)
+    # Select numeric features
+    numeric_features = ['age', 'HSGPA', 'WC', 'WPS', 'Sixltr',
+                        'Dic', 'funct', 'pronoun', 'ppron', 'i',
+                        'we', 'you', 'shehe', 'they', 'ipron',
+                        'article', 'verb', 'auxverb', 'past', 'present',
+                        'future', 'adverb', 'preps', 'conj', 'negate',
+                        'quant', 'number', 'swear', 'social', 'family',
+                        'friend', 'humans', 'affect', 'posemo', 'negemo',
+                        'anx', 'anger', 'sad', 'cogmech', 'insight',
+                        'cause', 'discrep', 'tentat', 'certain', 'inhib',
+                        'incl', 'excl', 'percept', 'see', 'hear',
+                        'feel', 'bio', 'body', 'health', 'sexual',
+                        'ingest', 'relativ', 'motion', 'space', 'time',
+                        'work', 'achieve', 'leisure', 'home', 'money',
+                        'relig', 'death', 'assent', 'nonfl', 'filler',
+                        'pronadv', 'shehethey', 'AllPunc', 'Period', 'Comma',
+                        'Colon', 'SemiC', 'QMark', 'Exclam', 'Dash',
+                        'Quote', 'Apostro', 'Parenth', 'OtherP', 'count_punct',
+                        'count_stopwords', 'nr_token', 'nr_adj', 'nr_noun', 'nr_verb',
+                        'nr_number', 'topic1', 'topic2', 'topic3', 'topic4',
+                        'topic5', 'topic6', 'topic7', 'topic8', 'topic9',
+                        'topic10', 'topic11', 'topic12', 'topic13', 'topic14',
+                        'topic15']
 
-    stopword_list = list(stopwords.words('Dutch'))
 
-    pipe = make_pipeline(TfidfVectorizer(lowercase=True, stop_words=stopword_list), SVC(class_weight='balanced'))
-    scores = cross_val_score(pipe, X_train, y_train, cv=5)
-    pickle.dump(pipe, open("../data/model/"+ filename+ "_model.sav", 'wb'))
+    # Change object (string) type of features to float
+    change_type = ['WPS', 'Sixltr',
+                   'Dic', 'funct', 'pronoun', 'ppron', 'i',
+                   'we', 'you', 'shehe', 'they', 'ipron',
+                   'article', 'verb', 'auxverb', 'past', 'present',
+                   'future', 'adverb', 'preps', 'conj', 'negate',
+                   'quant', 'number', 'swear', 'social', 'family',
+                   'friend', 'humans', 'affect', 'posemo', 'negemo',
+                   'anx', 'anger', 'sad', 'cogmech', 'insight',
+                   'cause', 'discrep', 'tentat', 'certain', 'inhib',
+                   'incl', 'excl', 'percept', 'see', 'hear',
+                   'feel', 'bio', 'body', 'health', 'sexual',
+                   'ingest', 'relativ', 'motion', 'space', 'time',
+                   'work', 'achieve', 'leisure', 'home', 'money',
+                   'relig', 'death', 'assent', 'nonfl', 'filler',
+                   'pronadv', 'shehethey', 'AllPunc', 'Period', 'Comma',
+                   'Colon', 'SemiC', 'QMark', 'Exclam', 'Dash',
+                   'Quote', 'Apostro', 'Parenth', 'OtherP']
+    df[change_type] = df[change_type].apply(lambda x: x.str.replace(',', '.'))
+    df[change_type] = df[change_type].astype(float).fillna(0.0)
 
-    print('5-fold cross validation scores:', scores)
-    print('average of 5-fold cross validation scores:', scores.mean())
+    # Scaling features
+    # Apply standard scaler and polynomial features algorithms to numerical features
+    numeric_transformer = Pipeline(steps=[('scaler', StandardScaler())])
 
-    pipe.fit(X_train, y_train)
-    predictions = pipe.predict(X_test)
-    print("Accuracy for SVM on test_set: %s" % accuracy_score(y_test, predictions))
-    cm = confusion_matrix(y_test, predictions)
-    print(classification_report(y_test, predictions))
+    # Apply one hot-encoding for categorical columns
+    categorical_transformer = Pipeline(steps=[
+        ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
-    with open(r'../results/output/classification_reports/'+ filename+'.txt', 'w') as f:
-        with redirect_stdout(f):
-            print('5-fold cross validation scores:', scores)
-            # print('/n')
-            print('average of 5-fold cross validation scores:', scores.mean())
-            # print('/n')
-            print("Accuracy for SVM on test_set: %s" % accuracy_score(y_test, predictions))
-            # print('/n')
-            print(classification_report(y_test, predictions))
+    # Combine both numerical and categorical column
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numeric_transformer, numeric_features),
+            ('cat', categorical_transformer, categorical_features)])
 
-    sns.heatmap(cm / np.sum(cm), annot=True, fmt='.2%', cmap='Blues')
+    # Define the SMOTE and Logistic Regression algorithms
+    smt = SMOTE(random_state=42)
+    lor = SVC(kernel='linear')
+
+    # Chain all the steps using the Pipeline module
+    clf = Pipeline([('preprocessor', preprocessor), ('smt', smt),
+                    ('lor', lor)])
+
+    # Split the data into train and test folds and fit the train set using chained pipeline
+    y = df['bsa_dummy']
+    X = df.drop('bsa_dummy', axis=1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=50)
+    clf.fit(X_train, y_train)
+
+    # Train score
+    print('train score: ', clf.score(X_train, y_train))
+    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+        print('train score: ', clf.score(X_train, y_train), file=f)
+
+    # Test score
+    print('test score: ', clf.score(X_test, y_test))
+    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+        print('\n', file=f)
+        print('test score: ', clf.score(X_test, y_test), file=f)
+
+    # Predict results on the test set
+    clf_predicted = clf.predict(X_test)
+
+    # Build confusion matrix
+    confusion = confusion_matrix(y_test, clf_predicted)
+    print(confusion)
+    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+        print('\n', confusion, file=f)
+
+    # Print classification report
+    print(classification_report(y_test, clf_predicted, target_names=['0', '1']))
+    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+        print('\n', classification_report(y_test, clf_predicted, target_names=['0', '1']), file=f)
+
+    # Extract feature importance
+    importance = clf.steps[2][1].coef_
+    feature_names = numeric_features + categorical_features
+
+    # Zip feature importance and feature names in the format of dictionary
+    coef_dict = {}
+    for coef, feat in zip(clf.steps[2][1].coef_[0, :], feature_names):
+        coef_dict[feat] = coef
+
+    # Sort feature_importance values
+    coef_dict = dict(sorted(coef_dict.items(), key=lambda item: item[1]))
+
+    # Turn dictionary to series
+    feature_importance = pd.Series(list(coef_dict.values()), index=coef_dict.keys())
+    with open('../../results/output/classification_reports/svm/feature_importance.txt', 'w') as f:
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(feature_importance, file=f)
+
+    # Plot feature importance
+    feature_importance.plot.barh(figsize=(15, 25))
     plt.show()
 
 
-if __name__=='__main__':
-    df = pd.read_csv(r'..\data\processed\motivation_liwc_meta_pos_lang.csv')
-    df = df.iloc[:, 5:105]
 
-    df_2016 = pd.read_csv('../data/raw/motivation_2016.csv')
-    df_2016.dropna(subset=['bsa_dummy', 'motivation'], inplace=True)
-    df_2016['bsa_dummy'] = df_2016['bsa_dummy'].replace({0: 1, 1: 0})
-    svm_func(df_2016, 'svm_df_2016')
+
+
+if __name__=='__main__':
+    df = pd.read_csv(r'..\..\data\processed\motivation_liwc_meta_pos_topic_n15.csv')
+    svm_numeric(df)
