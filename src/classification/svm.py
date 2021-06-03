@@ -97,7 +97,7 @@ def svm_numeric(df):
     # Split the data into train and test folds and fit the train set using chained pipeline
     y = df['bsa_dummy']
     X = df.drop('bsa_dummy', axis=1)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=50)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=50, shuffle=True, stratify=y)
     clf.fit(X_train, y_train)
 
     # Train score
@@ -146,8 +146,6 @@ def svm_numeric(df):
     # Plot feature importance
     feature_importance.plot.barh(figsize=(15, 25))
     plt.show()
-
-
 
 
 
