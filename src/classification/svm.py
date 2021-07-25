@@ -1,3 +1,9 @@
+# Last update 25-07-2021
+# Remove reenrolled from the list of features
+# change the target variable from bsa_dummy to reenrolled
+# add df['program'] to the list of features
+
+
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import PolynomialFeatures
@@ -17,14 +23,14 @@ def svm_numeric(df):
     # Remove extra columns
     del df['language']
     del df['motivation']
-    del df['program']
+    # del df['program']
     del df['studentnr_crypt']
 
     df = df.fillna(method='ffill')
 
     # Select categorical features
     categorical_features = ['cohort', 'field', 'prior_educ', 'previously_enrolled', 'multiple_requests', 'gender',
-                            'interest', 'ase', 'reenrolled', 'year']
+                            'interest', 'ase', 'year', 'program']
 
     # Select numeric features
     numeric_features = ['age', 'HSGPA', 'WC', 'WPS', 'Sixltr',
@@ -50,7 +56,6 @@ def svm_numeric(df):
                         'topic10', 'topic11', 'topic12', 'topic13', 'topic14',
                         'topic15']
 
-
     # Change object (string) type of features to float
     change_type = ['WPS', 'Sixltr',
                    'Dic', 'funct', 'pronoun', 'ppron', 'i',
@@ -73,7 +78,7 @@ def svm_numeric(df):
     df[change_type] = df[change_type].astype(float).fillna(0.0)
 
     # Scaling features
-    # Apply standard scaler and polynomial features algorithms to numerical features
+    # Apply standard scaler to numerical features
     numeric_transformer = Pipeline(steps=[('scaler', StandardScaler())])
 
     # Apply one hot-encoding for categorical columns
@@ -96,18 +101,20 @@ def svm_numeric(df):
 
     # Split the data into train and test folds and fit the train set using chained pipeline
     y = df['bsa_dummy']
+    # y = df['reenrolled']
     X = df.drop('bsa_dummy', axis=1)
+    # X = df.drop('reenrolled', axis=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=50, shuffle=True, stratify=y)
     clf.fit(X_train, y_train)
 
     # Train score
     print('train score: ', clf.score(X_train, y_train))
-    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+    with open('../../results/output/classification_reports/svm/remove_reenrolled_bsa_is_target/report.txt', 'a+') as f:
         print('train score: ', clf.score(X_train, y_train), file=f)
 
     # Test score
     print('test score: ', clf.score(X_test, y_test))
-    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+    with open('../../results/output/classification_reports/svm/remove_reenrolled_bsa_is_target/report.txt', 'a+') as f:
         print('\n', file=f)
         print('test score: ', clf.score(X_test, y_test), file=f)
 
@@ -117,12 +124,12 @@ def svm_numeric(df):
     # Build confusion matrix
     confusion = confusion_matrix(y_test, clf_predicted)
     print(confusion)
-    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+    with open('../../results/output/classification_reports/svm/remove_reenrolled_bsa_is_target/report.txt', 'a+') as f:
         print('\n', confusion, file=f)
 
     # Print classification report
     print(classification_report(y_test, clf_predicted, target_names=['0', '1']))
-    with open('../../results/output/classification_reports/svm/report.txt', 'a+') as f:
+    with open('../../results/output/classification_reports/svm/remove_reenrolled_bsa_is_target/report.txt', 'a+') as f:
         print('\n', classification_report(y_test, clf_predicted, target_names=['0', '1']), file=f)
 
     # Extract feature importance
@@ -139,7 +146,8 @@ def svm_numeric(df):
 
     # Turn dictionary to series
     feature_importance = pd.Series(list(coef_dict.values()), index=coef_dict.keys())
-    with open('../../results/output/classification_reports/svm/feature_importance.txt', 'w') as f:
+    with open('../../results/output/classification_reports/svm/remove_reenrolled_bsa_is_target/feature_importance.txt'
+              '', 'w') as f:
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             print(feature_importance, file=f)
 
@@ -148,7 +156,6 @@ def svm_numeric(df):
     plt.show()
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     df = pd.read_csv(r'..\..\data\processed\motivation_liwc_meta_pos_topic_n15.csv')
     svm_numeric(df)
