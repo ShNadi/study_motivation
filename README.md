@@ -2,7 +2,7 @@
 
 Version 0.1.0
 
-A short description of your project
+This study focused on predicting university dropout by using text mining techniques with the aim of exhuming information contained in students’ written motivation. In a feature engineering step, we created new variables from the raw text data to predict dropout and enhance the already available set of predictive student characteristics. Support Vector Machines (SVMs) were then trained in the classification step on a dataset of 7,060 motivation statements of students enrolling in a non-selective bachelor at a Dutch university during years 2014 and 2015. We used various combinations of input resulting in six different models. Input to the models consisted of a set of student characteristics, bag-of-words features from text data, topic modeling-based features, and extracted cognitive and non-cognitive features from text. Although the combination of text and student characteristics did not improve the prediction of dropout, results showed that text analysis alone predicted dropout similarly well as a set of student characteristics.
 
 
 ## Project organization
